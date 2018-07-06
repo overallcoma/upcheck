@@ -168,9 +168,9 @@ def post_twitter_outage_over(consumer_key, consumer_secret, access_token, access
         last_outage_start = get_last_outage_start(dbfile)
         last_outage_end = get_last_outage_end(dbfile)
         last_outage_time = get_last_outage_time(dbfile)
-        tweetstring = "Just had an outage from {0} UTC to {1} UTC for a total of {2} seconds. @GetSpectrum @Ask_Spectrum #customerservice".format(format_datetime_time(last_outage_start), format_datetime_time(last_outage_end), last_outage_time)
+        tweetstring = "Just had an outage from {0} UTC to {1} UTC for a total of {2} seconds. @GetSpectrum @Ask_Spectrum #customerservice #icanhazinternet".format(format_datetime_time(last_outage_start), format_datetime_time(last_outage_end), last_outage_time)
         api.update_status(tweetstring)
-        tweetstring2 = "@GetSpectrum @Ask_Spectrum Why did I lose internet from {0}UTC to {1}UTC for a total of {2} seconds. @GetSpectrum @Ask_Spectrum #customerservice".format(format_datetime_monthdaytime(last_outage_start), format_datetime_monthdaytime(last_outage_end), last_outage_time)
+        tweetstring2 = "@GetSpectrum @Ask_Spectrum Why did I lose internet from {0}UTC to {1}UTC for a total of {2} seconds? #Spectrum #customerservice #icanhazinternet".format(format_datetime_monthdaytime(last_outage_start), format_datetime_monthdaytime(last_outage_end), last_outage_time)
         api.update_status(tweetstring2)
     except Error as e:
         print(e)
