@@ -187,6 +187,7 @@ except Error as e:
     exit(1)
 try:
     db_createtable(upcheckdblocation)
+    print("Upcheck is active")
 except Error as e:
     print("Unable to Create Table")
     print(e)
