@@ -184,7 +184,7 @@ except Error as e:
     print(e)
     exit(1)
 try:
-    db_createtable(upcheckdblocation, upchecktable)
+    db_createtable(upcheckdblocation)
 except Error as e:
     print("Unable to Create Table")
     print(e)
