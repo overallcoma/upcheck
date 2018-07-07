@@ -6,33 +6,37 @@ import tweepy
 import sqlite3
 from sqlite3 import Error, Connection, Cursor
 
-# Load Config File Values
+# Load OS Environment Values hopefully passed from Docker
 try:
     urltocheck = os.environ['UPCHECK_URLTOCHECK']
 except Error as e:
     print(e)
+    exit(1)
 try:
     consumer_key = os.environ['UPCHECK_TWITTER_CONSUMER_KEY']
 except Error as e:
     print(e)
+    exit(1)
 try:
     consumer_secret = os.environ['UPCHECK_TWITTER_CONSUMER_SECRET']
 except Error as e:
     print(e)
+    exit(1)
 try:
     access_token = os.environ['UPCHECK_TWITTER_ACCESS_TOKEN']
 except Error as e:
     print(e)
+    exit(1)
 try:
     access_token_secret = os.environ['UPCHECK_TWITTER_ACCESS_TOKEN_SECRET']
 except Error as e:
     print(e)
-try: upcheckdblocation = os.environ['UPCHECK_DB_LOCATION']
+    exit(1)
+try:
+    upcheckdblocation = os.environ['UPCHECK_DB_LOCATION']
 except Error as e:
     print(e)
-
-upchecktable = "upcheck"
-outage_active = 0
+    exit(1)
 
 
 # Sqlite Connection Check
@@ -40,27 +44,17 @@ def dbconnect(dbfile):
     try:
         connection = sqlite3.connect(dbfile)
         print(sqlite3.version)
+        connection.close()
     except Error as e:
         print(e)
-    finally:
-        connection.close()
+        exit(1)
 
 
-def db_createtable(dbfile, tablename):
+def db_createtable(dbfile):
     connection = sqlite3.connect(dbfile)
     cursor = connection.cursor()
     sql = 'CREATE TABLE IF NOT EXISTS upcheck (record_number integer PRIMARY KEY AUTOINCREMENT, out_start DATE, out_end DATE, out_time text)'
     cursor.execute(sql)
-
-
-try:
-    dbconnect(upcheckdblocation)
-except:
-    print("Could not connect to database")
-try:
-    db_createtable(upcheckdblocation, upchecktable)
-except:
-    print("Unable to Create Table")
 
 
 def check_if_up (url):
@@ -70,9 +64,6 @@ def check_if_up (url):
             return 0
         else:
             return 1
-    except (urllib.error.HTTPError, urllib.error.URLError):
-        print("Outage detected")
-        return 1
     except Error as e:
         print("Outage Detected")
         print(e)
@@ -128,6 +119,7 @@ def get_last_outage_start(dbfile):
         print(e)
         return 0
 
+
 def get_last_outage_end(dbfile):
     try:
         connection = sqlite3.connect(dbfile)
@@ -140,6 +132,7 @@ def get_last_outage_end(dbfile):
     except Error as e:
         print(e)
         return 0
+
 
 def format_datetime_monthdaytime(inputtime):
     try:
@@ -160,6 +153,7 @@ def format_datetime_time(inputtime):
         print(e)
         return 0
 
+
 def post_twitter_outage_over(consumer_key, consumer_secret, access_token, access_token_secret, dbfile):
     try:
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -177,6 +171,18 @@ def post_twitter_outage_over(consumer_key, consumer_secret, access_token, access
 
 
 #the actual operations
+upchecktable = "upcheck"
+outage_active = 0
+try:
+    dbconnect(upcheckdblocation)
+except:
+    print("Could not connect to database")
+    exit(1)
+try:
+    db_createtable(upcheckdblocation, upchecktable)
+except:
+    print("Unable to Create Table")
+    exit(1)
 while True:
     try:
         check_status = check_if_up(urltocheck)
