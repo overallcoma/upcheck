@@ -69,6 +69,7 @@ def check_if_up (url):
         else:
             return 1
     except Error as e:
+        pass
         currentime = datetime.datetime.now()
         print("{0} -- Outage Detected".format(currentime))
         return 1
