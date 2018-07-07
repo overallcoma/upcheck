@@ -69,7 +69,8 @@ def check_if_up (url):
         else:
             return 1
     except Error as e:
-        print("Outage Detected")
+        currentime = datetime.datetime.now()
+        print("{0} -- Outage Detected".format(currentime))
         print(e)
         return 1
 
@@ -92,7 +93,8 @@ def write_out_record(dbfile, starttime, endtime, totaltime):
         cursor.execute("INSERT INTO upcheck VALUES (NULL, ?, ?, ?)", (starttime, endtime, totaltime))
         connection.commit()
         connection.close()
-        print("Outage is over")
+        currentime = datetime.datetime.now()
+        print("{0{ -- Outage is over".format(currentime))
     except Error as e:
         print(e)
 
