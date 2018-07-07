@@ -1,5 +1,6 @@
 import os
 import urllib.request
+import urllib.error
 import datetime
 import time
 import tweepy
@@ -45,8 +46,8 @@ def dbconnect(dbfile):
         connection = sqlite3.connect(dbfile)
         print(sqlite3.version)
         connection.close()
-    except Error as e:
-        print(e)
+    except Error as t:
+        print(t)
         exit(1)
 
 
@@ -56,8 +57,8 @@ def db_createtable(dbfile):
         cursor = connection.cursor()
         sql = 'CREATE TABLE IF NOT EXISTS upcheck (record_number integer PRIMARY KEY AUTOINCREMENT, out_start DATE, out_end DATE, out_time text)'
         cursor.execute(sql)
-    except Error as e:
-        print(e)
+    except Error as t:
+        print(t)
         exit(1)
 
 
@@ -68,9 +69,13 @@ def check_if_up (url):
             return 0
         else:
             return 1
-    except Error as e:
-        pass
+    except urllib.error.URLError:
         currentime = datetime.datetime.now()
+        print("{0} -- Outage Detected".format(currentime))
+        return 1
+    except Error as t:
+        currentime = datetime.datetime.now()
+        print(str(t))
         print("{0} -- Outage Detected".format(currentime))
         return 1
 
@@ -81,8 +86,8 @@ def time_difference(starttime, endtime):
         string_return = str(time_delta.total_seconds())
         string_return = string_return.split(".")
         return string_return[0]
-    except Error as e:
-        print(e)
+    except Error as t:
+        print(t)
         return 0
 
 
@@ -95,8 +100,8 @@ def write_out_record(dbfile, starttime, endtime, totaltime):
         connection.close()
         currentime = datetime.datetime.now()
         print("{0{ -- Outage is over".format(currentime))
-    except Error as e:
-        print(e)
+    except Error as t:
+        print(t)
 
 
 def get_last_outage_time(dbfile):
@@ -108,8 +113,8 @@ def get_last_outage_time(dbfile):
         connection.commit()
         connection.close()
         return last_outage_time
-    except Error as e:
-        print(e)
+    except Error as t:
+        print(t)
         return 0
 
     
@@ -122,8 +127,8 @@ def get_last_outage_start(dbfile):
         connection.commit()
         connection.close()
         return last_outage_start
-    except Error as e:
-        print(e)
+    except Error as t:
+        print(t)
         return 0
 
 
@@ -136,8 +141,8 @@ def get_last_outage_end(dbfile):
         connection.commit()
         connection.close()
         return last_outage_end
-    except Error as e:
-        print(e)
+    except Error as t:
+        print(t)
         return 0
 
 
@@ -146,8 +151,8 @@ def format_datetime_monthdaytime(inputtime):
         return_time = datetime.datetime.strptime(inputtime, '%Y-%m-%d %H:%M:%S.%f')
         return_time = return_time.strftime("%B %d at %H:%M")
         return return_time
-    except Error as e:
-        print(e)
+    except Error as t:
+        print(t)
         return 0
 
 
@@ -156,8 +161,8 @@ def format_datetime_time(inputtime):
         return_time = datetime.datetime.strptime(inputtime, '%Y-%m-%d %H:%M:%S.%f')
         return_time = return_time.strftime("%H:%M")
         return return_time
-    except Error as e:
-        print(e)
+    except Error as t:
+        print(t)
         return 0
 
 
@@ -173,8 +178,8 @@ def post_twitter_outage_over(consumer_key, consumer_secret, access_token, access
         api.update_status(tweetstring)
         tweetstring2 = "@GetSpectrum @Ask_Spectrum Why did I lose internet from {0}UTC to {1}UTC for a total of {2} seconds? #Spectrum #customerservice #icanhazinternet".format(format_datetime_monthdaytime(last_outage_start), format_datetime_monthdaytime(last_outage_end), last_outage_time)
         api.update_status(tweetstring2)
-    except Error as e:
-        print(e)
+    except Error as t:
+        print(t)
 
 
 #the actual operations
