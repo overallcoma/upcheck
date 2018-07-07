@@ -178,17 +178,23 @@ def post_twitter_outage_over(consumer_key, consumer_secret, access_token, access
 
 #the actual operations
 while True:
-    check_status = check_if_up(urltocheck)
+    try:
+        check_status = check_if_up(urltocheck)
+    except Error as (e):
+        print(e)
+        check_status = 1
     if check_status == 0:
         if outage_active == 1:
             outage_active = 0
             outage_end = datetime.datetime.now()
-            outage_total_time = time_difference(outage_start, outage_end)
-            write_out_record(upcheckdblocation, outage_start, outage_end, outage_total_time)
-            post_twitter_outage_over(consumer_key, consumer_secret, access_token, access_token_secret, upcheckdblocation)
-        time.sleep(10)
+            try:
+                outage_total_time = time_difference(outage_start, outage_end)
+                write_out_record(upcheckdblocation, outage_start, outage_end, outage_total_time)
+                post_twitter_outage_over(consumer_key, consumer_secret, access_token, access_token_secret, upcheckdblocation)
+            except Error as e:
+                print(e)
     elif check_status == 1:
         if outage_active == 0:
             outage_start = datetime.datetime.now()
         outage_active = 1
-        time.sleep(10)
+    time.sleep(7)
