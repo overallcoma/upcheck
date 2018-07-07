@@ -180,7 +180,7 @@ def post_twitter_outage_over(consumer_key, consumer_secret, access_token, access
 while True:
     try:
         check_status = check_if_up(urltocheck)
-    except Error as (e):
+    except Error as e:
         print(e)
         check_status = 1
     if check_status == 0:
