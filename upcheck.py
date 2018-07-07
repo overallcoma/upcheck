@@ -71,7 +71,6 @@ def check_if_up (url):
     except Error as e:
         currentime = datetime.datetime.now()
         print("{0} -- Outage Detected".format(currentime))
-        print(e)
         return 1
 
 
@@ -111,6 +110,7 @@ def get_last_outage_time(dbfile):
     except Error as e:
         print(e)
         return 0
+
     
 def get_last_outage_start(dbfile):
     try:
@@ -193,11 +193,7 @@ except Error as e:
     print(e)
     exit(1)
 while True:
-    try:
-        check_status = check_if_up(urltocheck)
-    except Error as e:
-        print(e)
-        check_status = 1
+    check_status = check_if_up(urltocheck)
     if check_status == 0:
         if outage_active == 1:
             outage_active = 0
