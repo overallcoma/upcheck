@@ -51,10 +51,14 @@ def dbconnect(dbfile):
 
 
 def db_createtable(dbfile):
-    connection = sqlite3.connect(dbfile)
-    cursor = connection.cursor()
-    sql = 'CREATE TABLE IF NOT EXISTS upcheck (record_number integer PRIMARY KEY AUTOINCREMENT, out_start DATE, out_end DATE, out_time text)'
-    cursor.execute(sql)
+    try:
+        connection = sqlite3.connect(dbfile)
+        cursor = connection.cursor()
+        sql = 'CREATE TABLE IF NOT EXISTS upcheck (record_number integer PRIMARY KEY AUTOINCREMENT, out_start DATE, out_end DATE, out_time text)'
+        cursor.execute(sql)
+    except Error as e:
+        print(e)
+        exit(1)
 
 
 def check_if_up (url):
@@ -175,13 +179,15 @@ upchecktable = "upcheck"
 outage_active = 0
 try:
     dbconnect(upcheckdblocation)
-except:
+except Error as e:
     print("Could not connect to database")
+    print(e)
     exit(1)
 try:
     db_createtable(upcheckdblocation, upchecktable)
-except:
+except Error as e:
     print("Unable to Create Table")
+    print(e)
     exit(1)
 while True:
     try:
