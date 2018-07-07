@@ -99,7 +99,7 @@ def write_out_record(dbfile, starttime, endtime, totaltime):
         connection.commit()
         connection.close()
         currentime = datetime.datetime.now()
-        print("{0{ -- Outage is over".format(currentime))
+        print("{0} -- Outage is over".format(currentime))
     except Error as t:
         print(t)
 
