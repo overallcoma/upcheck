@@ -2,6 +2,7 @@ FROM alpine:latest
 RUN mkdir /upcheck
 COPY requirements.txt /upcheck
 COPY upcheck.py /upcheck
+COPY upcheck-schedule.py /upcheck
 RUN apk update
 RUN apk add python3-dev
 RUN apk add sqlite
