@@ -52,7 +52,6 @@ def get_outage_last_24h():
             if outage[0] >= yesterday:
                 valid_outages.append(outage)
         valid_outages = len(total_outages)
-        print(valid_outages)
         return valid_outages
     except Error as t:
         print(t)
@@ -60,10 +59,14 @@ def get_outage_last_24h():
 
 def tweet_outage_24h():
     outage_count = int(get_outage_last_24h())
+    currenttime = datetime.datetime.now()
+    yesterday = currenttime - (datetime.timedelta(days=1))
+    today_output_time = currenttime.strftime("%B %d")
+    yesterday_output_time = yesterday.strftime("%B %d")
     if outage_count.__int__() <= 0:
-        tweet_string = "No outages in the last 24 hours!  Keep up the good work @Get_Spectrum @Ask_Spectrum!"
+        tweet_string = "No outages from noon {0} to {1}!  24 hours of Internet!  Keep up the good work @GetSpectrum @Ask_Spectrum!".format(yesterday_output_time, today_output_time)
     elif outage_count.__int__() >= 1:
-        tweet_string = "There were {0} total outages yesterday @Get_Spectrum @Ask_Spectrum.  Please look into this!  #customerservice #icanhazinternet".format(outage_count)
+        tweet_string = "There were {0} total outages from noon {1} to {2} @GetSpectrum @Ask_Spectrum.  Please look into this!  #customerservice #icanhazinternet".format(outage_count, yesterday_output_time,today_output_time)
     post_to_twitter(tweet_string)
     print("24 Hour Report Posted to Twitter")
 
@@ -72,7 +75,7 @@ def outage_report_24h():
     tweet_outage_24h()
 
 
-schedule.every().day.at("07:30").do(outage_report_24h)
+schedule.every().day.at("17:30").do(outage_report_24h)
 
 while True:
     schedule.run_pending()
