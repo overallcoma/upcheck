@@ -10,7 +10,7 @@ import xml.etree.cElementTree as et
 
 try:
     urltocheck_speedtest = os.environ['UPCHECK_SPEEDTEST_RESULTS']
- except Error as e:
+except Error as e:
     print(e)
     exit(1)
 try:
