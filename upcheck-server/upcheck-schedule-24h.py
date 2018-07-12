@@ -91,7 +91,7 @@ def get_speedtest_xml(speedtesturl):
     return return_list
 
 
-def tweet_speed_24h:
+def tweet_speed_24h():
     speed_report = get_speedtest_xml(urltocheck_speedtest)
     average_dl = speed_report[0]
     average_ul = speed_report[1]
@@ -106,7 +106,6 @@ def outage_report_24h():
 
 def speed_report_24h():
     tweet_speed_24h()
-
 
 schedule.every().day.at("17:00").do(outage_report_24h)
 schedule.every().day.at("17:05").do(speed_report_24h)
