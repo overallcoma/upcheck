@@ -5,7 +5,7 @@ import datetime
 import time
 import tweepy
 import sqlite3
-from sqlite3 import Error, Connection, Cursor
+from sqlite3 import Error
 import subprocess
 
 # Load OS Environment Values hopefully passed from Docker
