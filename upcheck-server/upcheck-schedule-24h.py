@@ -38,6 +38,16 @@ try:
 except Error as e:
     print(e)
     exit(1)
+try:
+    target_twitter = os.environ['UPCHECK_TARGET_TWITTER_ACCOUNT']
+except Error as e:
+    print(e)
+    exit(1)
+try:
+    target_hashtags = os.environ['UPCHECK_HASHTAGS']
+except Error as e:
+    print(e)
+    exit(1)
 
 
 def post_to_twitter(tweet_string):
@@ -71,9 +81,9 @@ def tweet_outage_24h():
     today_output_time = currenttime.strftime("%B %d")
     yesterday_output_time = yesterday.strftime("%B %d")
     if outage_count.__int__() <= 0:
-        tweet_string = "No outages from noon {0} to {1}!  24 hours of Internet!  Keep up the good work @GetSpectrum @Ask_Spectrum!".format(yesterday_output_time, today_output_time)
+        tweet_string = "No outages from noon {0} to {1}!  24 hours of Internet!  Keep up the good work {2}!".format(yesterday_output_time, today_output_time, target_twitter)
     elif outage_count.__int__() >= 1:
-        tweet_string = "There were {0} total outages from noon {1} to {2} @GetSpectrum @Ask_Spectrum.  Please look into this!  #customerservice #icanhazinternet".format(outage_count, yesterday_output_time,today_output_time)
+        tweet_string = "There were {0} total outages from noon {1} to {2} {3}.  Please look into this! {4}".format(outage_count, yesterday_output_time,today_output_time, target_twitter, target_hashtags)
     post_to_twitter(tweet_string)
     print("24 Hour Report Posted to Twitter")
 
@@ -96,7 +106,7 @@ def tweet_speed_24h():
     average_dl = speed_report[0]
     average_ul = speed_report[1]
     average_ping = speed_report[2]
-    tweet_string = "Speedtest Averages for the last 24Hours - {0} Download, {1} Upload, {2} ping.".format(average_dl, average_ul, average_ping)
+    tweet_string = "Speedtest Averages for the last 24Hours - {0} Download, {1} Upload, {2} ping. {3}".format(average_dl, average_ul, average_ping, target_twitter)
     post_to_twitter(tweet_string)
 
 
@@ -106,6 +116,8 @@ def outage_report_24h():
 
 def speed_report_24h():
     tweet_speed_24h()
+
+tweet_speed_24h()
 
 schedule.every().day.at("17:00").do(outage_report_24h)
 schedule.every().day.at("17:05").do(speed_report_24h)

@@ -39,6 +39,16 @@ try:
 except Error as e:
     print(e)
     exit(1)
+try:
+    target_twitter = os.environ['UPCHECK_TARGET_TWITTER_ACCOUNT']
+except Error as e:
+    print(e)
+    exit(1)
+try:
+    target_hashtags = os.environ['UPCHECK_HASHTAGS']
+except Error as e:
+    print(e)
+    exit(1)
 
 
 # Sqlite Connection Check
@@ -176,10 +186,10 @@ def post_twitter_outage_over(consumer_key, consumer_secret, access_token, access
         last_outage_start = get_last_outage_start(dbfile)
         last_outage_end = get_last_outage_end(dbfile)
         last_outage_time = get_last_outage_time(dbfile)
-        tweetstring1 = "Just had an outage from {0} UTC to {1} UTC for a total of {2} seconds. @GetSpectrum @Ask_Spectrum #customerservice #icanhazinternet".format(format_datetime_time(last_outage_start), format_datetime_time(last_outage_end), last_outage_time)
+        tweetstring1 = "Just had an outage from {0} UTC to {1} UTC for a total of {2} seconds. {3} {4}".format(format_datetime_time(last_outage_start), format_datetime_time(last_outage_end), last_outage_time, target_twitter, target_hashtags)
         # debug
         # print(tweetstring) #for debugging
-        tweetstring2 = "@GetSpectrum @Ask_Spectrum Why did I lose internet from {0}UTC to {1}UTC for a total of {2} seconds? #Spectrum #customerservice #icanhazinternet".format(format_datetime_monthdaytime(last_outage_start), format_datetime_monthdaytime(last_outage_end), last_outage_time)
+        tweetstring2 = "{3} Why did I lose internet from {0}UTC to {1}UTC for a total of {2} seconds? {4}".format(format_datetime_monthdaytime(last_outage_start), format_datetime_monthdaytime(last_outage_end), last_outage_time, target_twitter, target_hashtags)
         # print(tweetstring) #fordebugging
         post_to_twitter(tweetstring1)
         post_to_twitter(tweetstring2)
