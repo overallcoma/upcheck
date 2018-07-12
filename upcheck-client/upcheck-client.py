@@ -62,14 +62,14 @@ def get_average_data():
     for result in results:
         selected_results.append(result[0])
     speedtest_dl_averrage = average(selected_results)
-    speedtest_dl_averrage = round(speedtest_dl_averrage)
+    speedtest_dl_averrage = round(speedtest_dl_averrage,2)
     cursor.execute("SELECT upload FROM upcheck WHERE timestamp > ?", (yesterday,))
     results = cursor.fetchall()
     selected_results = []
     for result in results:
         selected_results.append(result[0])
     speedtest_ul_average = average(selected_results)
-    speedtest_ul_average = round(speedtest_ul_average)
+    speedtest_ul_average = round(speedtest_ul_average,2)
     cursor.execute("SELECT ping FROM upcheck WHERE timestamp > ?", (yesterday,))
     results = cursor.fetchall()
     selected_results = []
