@@ -113,10 +113,6 @@ def primary_operation():
     average_ul = str(get_average_data()[1])
     average_ping = str(get_average_data()[2])
 
-    print(average_dl)
-    print(average_ul)
-    print(average_ping)
-
     xml_root = Element('SpeedtestResults')
     SubElement(xml_root, "average_dl").text = average_dl
     SubElement(xml_root, "average_ul").text = average_ul
