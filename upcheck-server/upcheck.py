@@ -149,7 +149,6 @@ def get_last_outage_end(dbfile):
 
 def format_datetime_monthdaytime(inputtime):
     try:
-        #return_time = datetime.datetime.strptime(inputtime, '%Y-%m-%d %H:%M:%S.%f')
         return_time = inputtime.strftime("%B %d at %H:%M")
         return return_time
     except Error as t:
@@ -159,7 +158,6 @@ def format_datetime_monthdaytime(inputtime):
 
 def format_datetime_time(inputtime):
     try:
-        #return_time = datetime.datetime.strptime(inputtime, '%Y-%m-%d %H:%M:%S.%f')
         return_time = inputtime.strftime("%H:%M")
         return return_time
     except Error as t:
@@ -192,7 +190,7 @@ def post_twitter_outage_over(consumer_key, consumer_secret, access_token, access
 # set some variables
 upchecktable = "upcheck"
 outage_active = 0
-child_process = "./upcheck-schedule.py"
+child_process = "./upcheck-schedule-24h.py"
 
 # launch child process for scheduled tasks
 subprocess.Popen(['python3', child_process])
