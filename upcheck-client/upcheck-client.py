@@ -1,10 +1,14 @@
 import os
 import speedtest
-import xml.etree.cElementTree as et
 import datetime
 import schedule
 import sqlite3
+import time
 from sqlite3 import Error
+from subprocess import call
+from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import SubElement
 
 xml_web_output = "/usr/share/nginx/html/upcheck-speedtest.xml"
 
@@ -57,24 +61,26 @@ def get_average_data():
     selected_results = []
     for result in results:
         selected_results.append(result[0])
-    speedtest_dl_averrage = selected_results
+    speedtest_dl_averrage = average(selected_results)
+    speedtest_dl_averrage = round(speedtest_dl_averrage)
     cursor.execute("SELECT upload FROM upcheck WHERE timestamp > ?", (yesterday,))
     results = cursor.fetchall()
     selected_results = []
     for result in results:
         selected_results.append(result[0])
-    speedtest_ul_average = selected_results
+    speedtest_ul_average = average(selected_results)
+    speedtest_ul_average = round(speedtest_ul_average)
     cursor.execute("SELECT ping FROM upcheck WHERE timestamp > ?", (yesterday,))
     results = cursor.fetchall()
     selected_results = []
     for result in results:
         selected_results.append(result[0])
-    speedtest_ping_average = selected_results
+    speedtest_ping_average = average(selected_results)
+    speedtest_ping_average = round(speedtest_ping_average,2)
     average_array = []
     average_array.append(speedtest_dl_averrage)
     average_array.append(speedtest_ul_average)
     average_array.append(speedtest_ping_average)
-
     return average_array
 
 
@@ -103,19 +109,30 @@ def primary_operation():
     timestamp = datetime.datetime.now()
     write_out_record(dbfile, timestamp, download_speed, upload_speed, ping)
 
-    average_dl = get_average_data()[0]
-    average_ul = get_average_data()[1]
-    average_ping = get_average_data()[2]
+    average_dl = str(get_average_data()[0])
+    average_ul = str(get_average_data()[1])
+    average_ping = str(get_average_data()[2])
 
-    xml_root = et.Element("SpeedtestResults")
-    et.SubElement(xml_root, "average_dl").text = average_dl
-    et.SubElement(xml_root, "average_ul").text = average_ul
-    et.SubElement(xml_root, "average_ping").text = average_ping
+    print(average_dl)
+    print(average_ul)
+    print(average_ping)
+
+    xml_root = Element('SpeedtestResults')
+    SubElement(xml_root, "average_dl").text = average_dl
+    SubElement(xml_root, "average_ul").text = average_ul
+    SubElement(xml_root, "average_ping").text = average_ping
 
     print(xml_root)
-    xml_output = et.tostring(str(xml_root), encoding='unicode')
-    xml_output_file = open(xml_web_output, "wb+")
+    xml_output = ElementTree.tostring(xml_root, encoding='unicode')
+    xml_output_file = open(xml_web_output, "w+")
     xml_output_file.write(xml_output)
+
+
+try:
+    call(["nginx"])
+except Error as e:
+    print(e)
+    print("Unable to start nginx")
 
 try:
     dbconnect(dbfile)
@@ -133,4 +150,6 @@ except Error as e:
 
 primary_operation()
 
-schedule.every().hour.do(primary_operation())
+while True:
+    schedule.every().hour.do(primary_operation)
+    time.sleep(1)
