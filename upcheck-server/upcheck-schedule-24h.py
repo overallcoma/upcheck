@@ -5,7 +5,14 @@ import schedule
 from sqlite3 import Error
 import tweepy
 import time
+import requests
+import xml.etree.cElementTree as et
 
+try:
+    urltocheck_speedtest = os.environ['UPCHECK_SPEEDTEST_RESULTS']
+except Error as e:
+    print(e)
+    exit(1)
 try:
     consumer_key = os.environ['UPCHECK_TWITTER_CONSUMER_KEY']
 except Error as e:
@@ -71,11 +78,38 @@ def tweet_outage_24h():
     print("24 Hour Report Posted to Twitter")
 
 
+def get_speedtest_xml(speedtesturl):
+    speedtest_page = requests.get(speedtesturl)
+    speedtest_results = et.fromstring(speedtest_page.text)
+    speedtest_dl = speedtest_results.find('average_dl').text
+    speedtest_ul = speedtest_results.find('average_ul').text
+    speedtest_ping = speedtest_results.find('average_ping').text
+    return_list = []
+    return_list.append(speedtest_dl)
+    return_list.append(speedtest_ul)
+    return_list.append(speedtest_ping)
+    return return_list
+
+
+def tweet_speed_24h:
+    speed_report = get_speedtest_xml(urltocheck_speedtest)
+    average_dl = speed_report[0]
+    average_ul = speed_report[1]
+    average_ping = speed_report[2]
+    tweet_string = "Speedtest Averages for the last 24Hours - {0} Download, {1} Upload, {2} ping.".format(average_dl, average_ul, average_ping)
+    post_to_twitter(tweet_string)
+
+
 def outage_report_24h():
     tweet_outage_24h()
 
 
-schedule.every().day.at("17:30").do(outage_report_24h)
+def speed_report_24h():
+    tweet_speed_24h()
+
+
+schedule.every().day.at("17:00").do(outage_report_24h)
+schedule.every().day.at("17:05").do(speed_report_24h)
 
 while True:
     schedule.run_pending()
