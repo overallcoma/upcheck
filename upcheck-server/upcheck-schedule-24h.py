@@ -62,12 +62,8 @@ def get_outage_last_24h():
         connection = sqlite3.connect(dbfile, detect_types=sqlite3.PARSE_DECLTYPES)
         cursor = connection.cursor()
         yesterday = (datetime.datetime.now()) - (datetime.timedelta(days=1))
-        cursor.execute("SELECT out_start FROM upcheck")
+        cursor.execute("SELECT out_start FROM upcheck WHERE out_start > ?", (yesterday,))
         total_outages = cursor.fetchall()
-        valid_outages = []
-        for outage in total_outages:
-            if outage[0] >= yesterday:
-                valid_outages.append(outage)
         valid_outages = len(total_outages)
         return valid_outages
     except Error as t:
@@ -75,14 +71,14 @@ def get_outage_last_24h():
 
 
 def tweet_outage_24h():
-    outage_count = int(get_outage_last_24h())
+    outage_count = get_outage_last_24h()
     currenttime = datetime.datetime.now()
     yesterday = currenttime - (datetime.timedelta(days=1))
     today_output_time = currenttime.strftime("%B %d")
     yesterday_output_time = yesterday.strftime("%B %d")
-    if outage_count.__int__() <= 0:
+    if outage_count <= 0:
         tweet_string = "No outages from noon {0} to {1}!  24 hours of Internet!  Keep up the good work {2}!".format(yesterday_output_time, today_output_time, target_twitter)
-    elif outage_count.__int__() >= 1:
+    elif outage_count >= 1:
         tweet_string = "There were {0} total outages from noon {1} to {2} {3}.  Please look into this! {4}".format(outage_count, yesterday_output_time,today_output_time, target_twitter, target_hashtags)
     post_to_twitter(tweet_string)
     print("24 Hour Report Posted to Twitter")
