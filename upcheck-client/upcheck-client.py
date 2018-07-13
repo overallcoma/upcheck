@@ -17,6 +17,11 @@ try:
 except Error as e:
     print(e)
     exit(1)
+# try:
+#     modem_log_page = os.environ['MODEM_LOG_PAGE']
+# except Error as e:
+#     print(e)
+#     exit(1)
 
 
 def dbconnect(dbfile):
@@ -98,6 +103,8 @@ def bits_to_bytes(inputvalue):
     megabits = bits / 1000000
     megabits = format(megabits, '.2f')
     return megabits
+
+
 
 
 def primary_operation():
