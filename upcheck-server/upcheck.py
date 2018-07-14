@@ -185,7 +185,7 @@ def get_modem_stats_from_outage():
         outfile = open(modem_web_output, "w+")
         outfile.write(modem_stats_text)
     except:
-        return "BAD"
+        return 2
 
 
 def post_to_twitter(tweet_string):
@@ -205,7 +205,8 @@ def post_twitter_outage_over(dbfile):
         post_to_twitter(tweetstring1)
         post_to_twitter(tweetstring2)
         if checkmodem:
-            tweetstring3 = "{0} The stats from this outage are available at {1} until the next outage".format(target_twitter, modem_stats_output)
+            if get_modem_stats_from_outage() != 2:
+                tweetstring3 = "{0} The stats from this outage are available at {1} until the next outage".format(target_twitter, modem_stats_output)
             post_to_twitter(tweetstring3)
     except Error as t:
         print(t)
