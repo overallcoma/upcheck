@@ -40,6 +40,7 @@ def check_if_up(url):
         return 1
 
 
+# Start nginx
 try:
     subprocess.call(["nginx"])
 except subprocess.CalledProcessError as e:
