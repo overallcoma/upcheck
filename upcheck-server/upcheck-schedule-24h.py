@@ -10,42 +10,42 @@ import xml.etree.cElementTree as et
 
 try:
     urltocheck_speedtest = os.environ['UPCHECK_SPEEDTEST_RESULTS']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     consumer_key = os.environ['UPCHECK_TWITTER_CONSUMER_KEY']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     consumer_secret = os.environ['UPCHECK_TWITTER_CONSUMER_SECRET']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     access_token = os.environ['UPCHECK_TWITTER_ACCESS_TOKEN']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     access_token_secret = os.environ['UPCHECK_TWITTER_ACCESS_TOKEN_SECRET']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     dbfile = os.environ['UPCHECK_DB_LOCATION']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     target_twitter = os.environ['UPCHECK_TARGET_TWITTER_ACCOUNT']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     target_hashtags = os.environ['UPCHECK_HASHTAGS']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 
