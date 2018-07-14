@@ -1,4 +1,6 @@
 schedule
-speedtest
+speedtest-cli
 bs4
 html5lib
+requests
+prettytable

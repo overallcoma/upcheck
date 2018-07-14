@@ -1,5 +1,5 @@
 import os
-import speedtest
+import speedtest_cli as speedtest
 import datetime
 import schedule
 import sqlite3

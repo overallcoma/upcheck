@@ -2,6 +2,8 @@ FROM nginx:alpine
 RUN mkdir /upcheck
 COPY requirements.txt /upcheck
 COPY upcheck-client.py /upcheck
+COPY upcheck-client-scheduledtasks.py /upcheck
+COPY upcheck-client-modem-scrape.py /upcheck
 RUN apk update
 RUN apk add python3-dev
 RUN apk add sqlite

@@ -46,8 +46,11 @@ except subprocess.CalledProcessError as e:
     print(e)
     print("Unable to start nginx")
 
+create_nginx_index_page()
+
 outage_active = 0
 child_process = "./upcheck-client-scheduledtasks.py"
+modem_scrape = "./upcheck-client-modem-scrape.py"
 
 
 while True:
@@ -57,6 +60,6 @@ while True:
             outage_active = 0
     elif check_status == 1:
         if outage_active == 0:
-            subprocess.Popen(['python3', child_process])
+            subprocess.Popen(['python3', modem_scrape])
             outage_active = 1
     time.sleep(10)

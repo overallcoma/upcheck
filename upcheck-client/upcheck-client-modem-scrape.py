@@ -23,7 +23,6 @@ def get_modem_log(table_number):
         if pt_counter > 0:
             pretty_table_out.add_row(cols)
         pt_counter = pt_counter + 1
-    print(pretty_table_out)
     return pretty_table_out
 
 
