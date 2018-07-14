@@ -54,12 +54,7 @@ try:
 except os.error as e:
     checkmodem = False
     print(e)
-if checkmodem:
-    try:
-        modem_status_url = os.environ['MODEM_STATUSRUL']
-    except os.error as e:
-        print(e)
-        exit(1)
+
 
 # Sqlite Connection Check
 def dbconnect(dbfile):
@@ -210,7 +205,7 @@ def post_twitter_outage_over(dbfile):
         post_to_twitter(tweetstring1)
         post_to_twitter(tweetstring2)
         if checkmodem:
-            tweetstring3 = "{0} The stats from this outage are available at {1} until the next outage".format(target_twitter, modem_status_url)
+            tweetstring3 = "{0} The stats from this outage are available at {1} until the next outage".format(target_twitter, modem_stats_output)
             post_to_twitter(tweetstring3)
     except Error as t:
         print(t)
