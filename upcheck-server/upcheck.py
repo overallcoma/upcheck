@@ -224,6 +224,13 @@ def create_nginx_index_page():
     create_index_page = open(index_page, "w+")
     create_index_page.write(index_page_content)
 
+# Start nginx
+try:
+    subprocess.call(["nginx"])
+except subprocess.CalledProcessError as e:
+    print(e)
+    print("Unable to start nginx")
+
 
 # set some variables
 upchecktable = "upcheck"
