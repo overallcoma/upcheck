@@ -264,22 +264,26 @@ while True:
         if outage_active == 1:
             outage_active = 0
             outage_end = datetime.datetime.now()
+            print("Outage is over - Ending Outage Status")
             try:
                 outage_total_time = time_difference(outage_start, outage_end)
                 write_out_record(dbfile, outage_start, outage_end, outage_total_time)
                 if checkmodem:
                     get_modem_stats_from_outage()
                 post_twitter_outage_over(dbfile)
-            except Error as (e):
+            except Error as e:
                 print(e)
     elif check_status == 1:
         if outage_active == 0:
             outage_start = datetime.datetime.now()
+            print("Outage Detected - Entering 10 second grace period")
             time.sleep(10)
             check_status = check_if_up(urltocheck)
             if check_status == 1:
+                print("Outage Confirmed - Entering Outage Timer")
                 outage_active = 1
             if check_status == 0:
+                print("Client Recovered before end of grace period - Cancelling Outage Status")
                 outage_active = 0
     time.sleep(7)
 
