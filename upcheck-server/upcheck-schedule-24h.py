@@ -113,6 +113,7 @@ def outage_report_24h():
 def speed_report_24h():
     tweet_speed_24h()
 
+print("UpCheck Scheduled Tasks are Active")
 
 schedule.every().day.at("17:00").do(outage_report_24h)
 schedule.every().day.at("17:05").do(speed_report_24h)
