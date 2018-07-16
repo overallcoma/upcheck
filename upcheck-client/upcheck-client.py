@@ -42,7 +42,8 @@ def check_if_up(url):
 
 # Start nginx
 try:
-    subprocess.call(["nginx"])
+    output_null = open(os.devnull, "w")
+    subprocess.call(["nginx"], stdout=output_null, stderr=subprocess.STDOUT)
 except subprocess.CalledProcessError as e:
     print(e)
     print("Unable to start nginx")
