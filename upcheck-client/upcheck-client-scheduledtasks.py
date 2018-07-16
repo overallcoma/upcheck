@@ -139,7 +139,7 @@ except Error as e:
     exit(1)
 try:
     db_createtable(dbfile)
-    print("Upcheck is active")
+    print("UpCheck Scheduled Tasks are Active")
 except Error as e:
     print("Unable to Create Table")
     print(e)
