@@ -54,6 +54,7 @@ outage_active = 0
 child_process = "./upcheck-client-scheduledtasks.py"
 modem_scrape = "./upcheck-client-modem-scrape.py"
 
+subprocess.Popen(['python3', child_process])
 
 while True:
     check_status = check_if_up(urltocheck)
