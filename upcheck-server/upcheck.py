@@ -270,10 +270,17 @@ while True:
                 if checkmodem:
                     get_modem_stats_from_outage()
                 post_twitter_outage_over(dbfile)
-            except Error as e:
+            except Error as (e):
                 print(e)
     elif check_status == 1:
         if outage_active == 0:
             outage_start = datetime.datetime.now()
-        outage_active = 1
+            time.sleep(10)
+            check_status = check_if_up(urltocheck)
+            if check_status == 1:
+                outage_active = 1
+            if check_status == 0:
+                outage_active = 0
     time.sleep(7)
+
+
