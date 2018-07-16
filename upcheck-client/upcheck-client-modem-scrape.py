@@ -34,5 +34,3 @@ write_modem_output = open(modem_web_output, "w+")
 write_modem_output.write(log1)
 write_modem_output.write(log2)
 write_modem_output.write(log3)
-
-

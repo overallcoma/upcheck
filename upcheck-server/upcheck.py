@@ -287,5 +287,3 @@ while True:
                 print("Client Recovered before end of grace period - Cancelling Outage Status")
                 outage_active = 0
     time.sleep(7)
-
-
