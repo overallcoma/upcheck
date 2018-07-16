@@ -1,8 +1,9 @@
-FROM alpine:latest
+FROM nginx:alpine
 RUN mkdir /upcheck
 COPY requirements.txt /upcheck
-COPY upcheck.py /upcheck
-COPY upcheck-schedule-24h.py /upcheck
+COPY upcheck-client.py /upcheck
+COPY upcheck-client-scheduledtasks.py /upcheck
+COPY upcheck-client-modem-scrape.py /upcheck
 RUN apk update
 RUN apk add python3-dev
 RUN apk add sqlite
@@ -10,4 +11,4 @@ RUN pip3 install --upgrade pip
 RUN pip3 install -r /upcheck/requirements.txt
 
 WORKDIR /upcheck
-CMD [ "python3", "./upcheck.py" ]
+CMD [ "python3", "./upcheck-client.py", "&& nginx &" ]

@@ -1,44 +1,59 @@
 import os
-import urllib.request
-import urllib.error
 import datetime
 import time
 import tweepy
 import sqlite3
-from sqlite3 import Error, Connection, Cursor
+from sqlite3 import Error
 import subprocess
+import requests
 
 # Load OS Environment Values hopefully passed from Docker
 try:
     urltocheck = os.environ['UPCHECK_URLTOCHECK']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     consumer_key = os.environ['UPCHECK_TWITTER_CONSUMER_KEY']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     consumer_secret = os.environ['UPCHECK_TWITTER_CONSUMER_SECRET']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     access_token = os.environ['UPCHECK_TWITTER_ACCESS_TOKEN']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     access_token_secret = os.environ['UPCHECK_TWITTER_ACCESS_TOKEN_SECRET']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
 try:
     dbfile = os.environ['UPCHECK_DB_LOCATION']
-except Error as e:
+except os.error as e:
     print(e)
     exit(1)
+try:
+    target_twitter = os.environ['UPCHECK_TARGET_TWITTER_ACCOUNT']
+except os.error as e:
+    print(e)
+    exit(1)
+try:
+    target_hashtags = os.environ['UPCHECK_HASHTAGS']
+except os.error as e:
+    print(e)
+    exit(1)
+try:
+    modem_stats_output = os.environ['UPCHECK_MODEM_SCRAPE_URL']
+    checkmodem = True
+except os.error as e:
+    checkmodem = False
+    print(e)
 
 
 # Sqlite Connection Check
@@ -63,20 +78,18 @@ def db_createtable(dbfile):
         exit(1)
 
 
-def check_if_up (url):
+def check_if_up(url):
     try:
-        checkreturn = (urllib.request.urlopen(url).getcode())
-        if checkreturn == 200:
+        check_return = requests.get(url)
+        check_return = check_return.status_code
+        if check_return == 200:
             return 0
         else:
+            currentime = datetime.datetime.now()
+            print("{0} -- Outage Detected".format(currentime))
             return 1
-    except urllib.error.URLError:
+    except requests.exceptions.RequestException as e:
         currentime = datetime.datetime.now()
-        print("{0} -- Outage Detected".format(currentime))
-        return 1
-    except Error as t:
-        currentime = datetime.datetime.now()
-        print(str(t))
         print("{0} -- Outage Detected".format(currentime))
         return 1
 
@@ -164,6 +177,17 @@ def format_datetime_time(inputtime):
         print(t)
         return 0
 
+
+def get_modem_stats_from_outage():
+    try:
+        modem_stats_text = requests.get(modem_stats_output)
+        modem_stats_text = modem_stats_text.content
+        outfile = open(modem_web_output, "w+")
+        outfile.write(modem_stats_text)
+    except:
+        return 2
+
+
 def post_to_twitter(tweet_string):
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
@@ -171,20 +195,43 @@ def post_to_twitter(tweet_string):
     api.update_status(tweet_string)
 
 
-def post_twitter_outage_over(consumer_key, consumer_secret, access_token, access_token_secret, dbfile):
+def post_twitter_outage_over(dbfile):
     try:
         last_outage_start = get_last_outage_start(dbfile)
         last_outage_end = get_last_outage_end(dbfile)
         last_outage_time = get_last_outage_time(dbfile)
-        tweetstring1 = "Just had an outage from {0} UTC to {1} UTC for a total of {2} seconds. @GetSpectrum @Ask_Spectrum #customerservice #icanhazinternet".format(format_datetime_time(last_outage_start), format_datetime_time(last_outage_end), last_outage_time)
-        # debug
-        # print(tweetstring) #for debugging
-        tweetstring2 = "@GetSpectrum @Ask_Spectrum Why did I lose internet from {0}UTC to {1}UTC for a total of {2} seconds? #Spectrum #customerservice #icanhazinternet".format(format_datetime_monthdaytime(last_outage_start), format_datetime_monthdaytime(last_outage_end), last_outage_time)
-        # print(tweetstring) #fordebugging
+        tweetstring1 = "Just had an outage from {0} UTC to {1} UTC for a total of {2} seconds. {3} {4}".format(format_datetime_time(last_outage_start), format_datetime_time(last_outage_end), last_outage_time, target_twitter, target_hashtags)
+        tweetstring2 = "{3} Why did I lose internet from {0}UTC to {1}UTC for a total of {2} seconds? {4}".format(format_datetime_monthdaytime(last_outage_start), format_datetime_monthdaytime(last_outage_end), last_outage_time, target_twitter, target_hashtags)
         post_to_twitter(tweetstring1)
         post_to_twitter(tweetstring2)
+        if checkmodem:
+            if get_modem_stats_from_outage() != 2:
+                tweetstring3 = "{0} The stats from this outage are available at {1} until the next outage".format(target_twitter, modem_stats_output)
+            post_to_twitter(tweetstring3)
     except Error as t:
         print(t)
+
+
+def create_nginx_index_page():
+    index_page = "/usr/share/nginx/html/index.html"
+    index_page_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>UpCheck-Server is Active</title>
+    </body>
+    </html>"""
+    create_index_page = open(index_page, "w+")
+    create_index_page.write(index_page_content)
+
+
+# Start nginx
+try:
+    output_null = open(os.devnull, "w")
+    subprocess.call(["nginx"], stdout=output_null, stderr=subprocess.STDOUT)
+except subprocess.CalledProcessError as e:
+    print(e)
+    print("Unable to start nginx")
 
 
 # set some variables
@@ -193,7 +240,9 @@ outage_active = 0
 child_process = "./upcheck-schedule-24h.py"
 
 # launch child process for scheduled tasks
+create_nginx_index_page()
 subprocess.Popen(['python3', child_process])
+modem_web_output = "/usr/share/nginx/html/upcheck-modem.txt"
 
 # the monitoring loop
 try:
@@ -218,7 +267,9 @@ while True:
             try:
                 outage_total_time = time_difference(outage_start, outage_end)
                 write_out_record(dbfile, outage_start, outage_end, outage_total_time)
-                post_twitter_outage_over(consumer_key, consumer_secret, access_token, access_token_secret, dbfile)
+                if checkmodem:
+                    get_modem_stats_from_outage()
+                post_twitter_outage_over(dbfile)
             except Error as e:
                 print(e)
     elif check_status == 1:
