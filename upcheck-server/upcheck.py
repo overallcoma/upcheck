@@ -60,7 +60,6 @@ except os.error as e:
 def dbconnect(dbfile):
     try:
         connection = sqlite3.connect(dbfile)
-        print(sqlite3.version)
         connection.close()
     except Error as t:
         print(t)
@@ -73,6 +72,8 @@ def db_createtable(dbfile):
         cursor = connection.cursor()
         sql = 'CREATE TABLE IF NOT EXISTS upcheck (record_number integer PRIMARY KEY AUTOINCREMENT, out_start TIMESTAMP, out_end TIMESTAMP, out_time text)'
         cursor.execute(sql)
+        connection.commit()
+        connection.close()
     except Error as t:
         print(t)
         exit(1)
