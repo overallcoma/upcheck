@@ -123,7 +123,6 @@ def primary_operation():
     SubElement(xml_root, "average_ul").text = average_ul
     SubElement(xml_root, "average_ping").text = average_ping
 
-    print(xml_root)
     xml_output = ElementTree.tostring(xml_root, encoding='unicode')
     xml_output_file = open(xml_web_output, "w+")
     xml_output_file.write(xml_output)
