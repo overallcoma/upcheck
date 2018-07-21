@@ -1,7 +1,6 @@
 import os
 import speedtest_cli as speedtest
 import datetime
-import schedule
 import sqlite3
 import time
 from sqlite3 import Error
@@ -145,8 +144,6 @@ except Error as e:
     print(e)
     exit(1)
 
-primary_operation()
-
 while True:
-    schedule.every(60).minutes.do(primary_operation)
-    time.sleep(1)
+    primary_operation()
+    time.sleep(3000)
