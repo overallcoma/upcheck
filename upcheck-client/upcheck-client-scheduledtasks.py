@@ -106,6 +106,7 @@ def bits_to_bytes(inputvalue):
 
 
 def primary_operation():
+    print("Running Speedtest")
     stest_result = run_speedtest()
     download_speed = str(bits_to_bytes(stest_result.download))
     upload_speed = str(bits_to_bytes(stest_result.upload))
@@ -147,5 +148,5 @@ except Error as e:
 primary_operation()
 
 while True:
-    schedule.every().hour.do(primary_operation)
+    schedule.every(60).minutes.do(primary_operation)
     time.sleep(1)
