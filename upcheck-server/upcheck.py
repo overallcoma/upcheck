@@ -208,6 +208,8 @@ def post_twitter_outage_over(dbfile):
         if checkmodem:
             if get_modem_stats_from_outage() != 2:
                 tweetstring3 = "{0} The stats from this outage are available at {1} until the next outage".format(target_twitter, modem_stats_output)
+            if get_modem_stats_from_outage() == 2:
+                tweetstring3 = "{0} I attempted to scrape the modem for signal status, but the modem was non-responsive.".format(target_twitter, modem_stats_output)
             post_to_twitter(tweetstring3)
     except Error as t:
         print(t)
