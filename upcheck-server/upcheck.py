@@ -261,12 +261,16 @@ except Error as e:
     print("Unable to Create Table")
     print(e)
     exit(1)
+
+sleeptime = 10
+
 while True:
     check_status = check_if_up(urltocheck)
     if check_status == 0:
         if outage_active == 1:
             outage_active = 0
             outage_end = datetime.datetime.now()
+            sleeptime = 10
             print("Outage is over - Ending Outage Status")
             try:
                 outage_total_time = time_difference(outage_start, outage_end)
@@ -285,7 +289,8 @@ while True:
             if check_status == 1:
                 print("Outage Confirmed - Entering Outage Timer")
                 outage_active = 1
+                sleeptime = 1
             if check_status == 0:
                 print("Client Recovered before end of grace period - Cancelling Outage Status")
                 outage_active = 0
-    time.sleep(7)
+    time.sleep(sleeptime)
